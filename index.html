@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Autoplay → Timer → Redirect</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f3f3f3;
+  text-align:center;
+}
+header{
+  background:#111;
+  color:#fff;
+  padding:14px;
+}
+#timer{
+  font-size:20px;
+  font-weight:bold;
+  margin:15px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:8px;
+  padding:8px;
+}
+iframe{
+  width:100%;
+  height:170px;
+  border-radius:8px;
+  background:#000;
+}
+.note{
+  font-size:13px;
+  color:#666;
+  margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h3>▶ Video Playing</h3>
+  <div class="note">Please wait for timer to complete</div>
+</header>
+
+<div id="timer">Time left: 60s</div>
+
+<div class="grid" id="players"></div>
+
+<script>
+const VIDEO_ID = "xqAC6j5Ztac";
+const TOTAL_PLAYERS = 10;
+const WATCH_TIME = 60; // seconds
+
+// 👉 Timer complete hone par yaha redirect hoga
+const REDIRECT_LINK = "https://youtu.be/xqAC6j5Ztac";
+
+let startTime = performance.now();
+
+// Load autoplay players (muted)
+(function loadPlayers(){
+  const wrap = document.getElementById("players");
+  const src = `https://www.youtube.com/embed/${VIDEO_ID}?autoplay=1&mute=1&playsinline=1`;
+
+  for(let i=0;i<TOTAL_PLAYERS;i++){
+    const f = document.createElement("iframe");
+    f.src = src;
+    f.allow = "autoplay; encrypted-media";
+    f.loading = "lazy";
+    wrap.appendChild(f);
+  }
+})();
+
+// Smooth timer + redirect
+function runTimer(now){
+  const elapsed = (now - startTime) / 1000;
+  const remain = Math.max(0, WATCH_TIME - elapsed);
+
+  document.getElementById("timer").innerText =
+    remain > 0 ? `Time left: ${Math.ceil(remain)}s` : "Redirecting…";
+
+  if(remain > 0){
+    requestAnimationFrame(runTimer);
+  } else {
+    // ✅ Timer complete → direct redirect
+    window.location.href = REDIRECT_LINK;
+  }
+}
+
+requestAnimationFrame(runTimer);
+</script>
+
+</body>
+  </html>
+  
